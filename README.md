@@ -10,6 +10,6 @@ Checks that there is no simultaneous return of `nil` error and an invalid value.
 ## Installation & usage
 
 ```
-$ go install github.com/Antonboom/nilnil
+$ go install github.com/Antonboom/nilnil@latest
 $ nilnil ./...
 ```
