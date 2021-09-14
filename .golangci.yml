@@ -1,0 +1,70 @@
+run:
+  tests: true
+
+issues:
+  max-same-issues: 0
+
+linters-settings:
+  gci:
+    local-prefixes: github.com/Antonboom/nilnil
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errname
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - gci
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ifshort
+    - importas
+    - ineffassign
+    - lll
+    - makezero
+    - misspell
+    - nakedret
+    - nilerr
+    - nestif
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - tagliatelle
+    - testpackage
+    - thelper
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - wastedassign
+    - whitespace
