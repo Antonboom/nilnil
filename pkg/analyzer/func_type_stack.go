@@ -4,13 +4,13 @@ import (
 	"go/ast"
 )
 
-type FuncTypeStack []*ast.FuncType
+type funcTypeStack []*ast.FuncType
 
-func (s *FuncTypeStack) Push(f *ast.FuncType) {
+func (s *funcTypeStack) Push(f *ast.FuncType) {
 	*s = append(*s, f)
 }
 
-func (s *FuncTypeStack) Pop() *ast.FuncType {
+func (s *funcTypeStack) Pop() *ast.FuncType {
 	if len(*s) == 0 {
 		return nil
 	}
@@ -21,7 +21,7 @@ func (s *FuncTypeStack) Pop() *ast.FuncType {
 	return f
 }
 
-func (s *FuncTypeStack) Top() *ast.FuncType {
+func (s *funcTypeStack) Top() *ast.FuncType {
 	if len(*s) == 0 {
 		return nil
 	}

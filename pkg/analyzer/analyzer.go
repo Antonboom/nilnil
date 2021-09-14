@@ -41,7 +41,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		typeSpecs[t.Name.Name] = t
 	})
 
-	var fs FuncTypeStack
+	var fs funcTypeStack
 	insp.Nodes(funcAndReturns, func(n ast.Node, push bool) (proceed bool) {
 		switch v := n.(type) {
 		case *ast.FuncLit:

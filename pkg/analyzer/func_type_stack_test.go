@@ -1,14 +1,12 @@
-package analyzer_test
+package analyzer
 
 import (
 	"go/ast"
 	"testing"
-
-	"github.com/Antonboom/nilnil/pkg/analyzer"
 )
 
-func TestFuncTypeStack(t *testing.T) {
-	var fs analyzer.FuncTypeStack
+func Test_funcTypeStack(t *testing.T) {
+	var fs funcTypeStack
 
 	if fs.Pop() != nil {
 		t.FailNow()
