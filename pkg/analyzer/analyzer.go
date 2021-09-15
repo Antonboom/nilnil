@@ -8,15 +8,37 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
-const reportMsg = "return both the `nil` error and invalid value: use a sentinel error instead"
+const (
+	name = "nilnil"
+	doc  = "Checks that there is no simultaneous return of `nil` error and an invalid value."
+
+	reportMsg = "return both the `nil` error and invalid value: use a sentinel error instead"
+)
 
 // New returns new nilnil analyzer.
 func New() *analysis.Analyzer {
-	return &analysis.Analyzer{
-		Name:     "nilnil",
-		Doc:      "Checks that there is no simultaneous return of `nil` error and an invalid value.",
-		Run:      run,
+	n := newNilNil()
+
+	a := &analysis.Analyzer{
+		Name:     name,
+		Doc:      doc,
+		Run:      n.run,
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
+	}
+	a.Flags.Var(&n.checkedTypes, "checked-types", "coma separated list")
+
+	return a
+}
+
+type nilNil struct {
+	checkedTypes checkedTypes
+	typeSpecs    map[string]*ast.TypeSpec
+}
+
+func newNilNil() *nilNil {
+	return &nilNil{
+		checkedTypes: newDefaultCheckedTypes(),
+		typeSpecs:    make(map[string]*ast.TypeSpec),
 	}
 }
 
@@ -30,20 +52,17 @@ var (
 	}
 )
 
-type typeSpecByName map[string]*ast.TypeSpec
-
-func run(pass *analysis.Pass) (interface{}, error) {
+func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 	insp := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
-	typeSpecs := typeSpecByName{}
-	insp.Preorder(types, func(n ast.Node) {
-		t := n.(*ast.TypeSpec)
-		typeSpecs[t.Name.Name] = t
+	insp.Preorder(types, func(node ast.Node) {
+		t := node.(*ast.TypeSpec)
+		n.typeSpecs[t.Name.Name] = t
 	})
 
 	var fs funcTypeStack
-	insp.Nodes(funcAndReturns, func(n ast.Node, push bool) (proceed bool) {
-		switch v := n.(type) {
+	insp.Nodes(funcAndReturns, func(node ast.Node, push bool) (proceed bool) {
+		switch v := node.(type) {
 		case *ast.FuncLit:
 			if push {
 				fs.Push(v.Type)
@@ -66,7 +85,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 
 			fRes1, fRes2 := ft.Results.List[0], ft.Results.List[1]
-			if !(isDangerNilField(fRes1, typeSpecs) && isErrorField(fRes2)) {
+			if !(n.isDangerNilField(fRes1) && n.isErrorField(fRes2)) {
 				return
 			}
 
@@ -82,23 +101,36 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func isDangerNilField(f *ast.Field, types typeSpecByName) bool {
-	return isDangerNilType(f.Type, types)
+func (n *nilNil) isDangerNilField(f *ast.Field) bool {
+	return n.isDangerNilType(f.Type)
 }
 
-func isDangerNilType(t ast.Expr, types typeSpecByName) bool {
+func (n *nilNil) isDangerNilType(t ast.Expr) bool {
 	switch v := t.(type) {
-	case *ast.StarExpr, *ast.ChanType, *ast.FuncType, *ast.InterfaceType, *ast.MapType:
-		return true
+	case *ast.StarExpr:
+		return n.checkedTypes.Contains(ptrType)
+
+	case *ast.FuncType:
+		return n.checkedTypes.Contains(funcType)
+
+	case *ast.InterfaceType:
+		return n.checkedTypes.Contains(ifaceType)
+
+	case *ast.MapType:
+		return n.checkedTypes.Contains(mapType)
+
+	case *ast.ChanType:
+		return n.checkedTypes.Contains(chanType)
+
 	case *ast.Ident:
-		if t, ok := types[v.Name]; ok {
-			return isDangerNilType(t.Type, nil)
+		if t, ok := n.typeSpecs[v.Name]; ok {
+			return n.isDangerNilType(t.Type)
 		}
 	}
 	return false
 }
 
-func isErrorField(f *ast.Field) bool {
+func (n *nilNil) isErrorField(f *ast.Field) bool {
 	return isIdent(f.Type, "error")
 }
 
