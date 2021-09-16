@@ -32,13 +32,11 @@ func New() *analysis.Analyzer {
 
 type nilNil struct {
 	checkedTypes checkedTypes
-	typeSpecs    map[string]*ast.TypeSpec
 }
 
 func newNilNil() *nilNil {
 	return &nilNil{
 		checkedTypes: newDefaultCheckedTypes(),
-		typeSpecs:    make(map[string]*ast.TypeSpec),
 	}
 }
 
@@ -52,12 +50,15 @@ var (
 	}
 )
 
+type typeSpecByName map[string]*ast.TypeSpec
+
 func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 	insp := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
+	typeSpecs := typeSpecByName{}
 	insp.Preorder(types, func(node ast.Node) {
 		t := node.(*ast.TypeSpec)
-		n.typeSpecs[t.Name.Name] = t
+		typeSpecs[t.Name.Name] = t
 	})
 
 	var fs funcTypeStack
@@ -85,7 +86,7 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 			}
 
 			fRes1, fRes2 := ft.Results.List[0], ft.Results.List[1]
-			if !(n.isDangerNilField(fRes1) && n.isErrorField(fRes2)) {
+			if !(n.isDangerNilField(fRes1, typeSpecs) && n.isErrorField(fRes2)) {
 				return
 			}
 
@@ -101,11 +102,11 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil
 }
 
-func (n *nilNil) isDangerNilField(f *ast.Field) bool {
-	return n.isDangerNilType(f.Type)
+func (n *nilNil) isDangerNilField(f *ast.Field, typeSpecs typeSpecByName) bool {
+	return n.isDangerNilType(f.Type, typeSpecs)
 }
 
-func (n *nilNil) isDangerNilType(t ast.Expr) bool {
+func (n *nilNil) isDangerNilType(t ast.Expr, typeSpecs typeSpecByName) bool {
 	switch v := t.(type) {
 	case *ast.StarExpr:
 		return n.checkedTypes.Contains(ptrType)
@@ -123,8 +124,8 @@ func (n *nilNil) isDangerNilType(t ast.Expr) bool {
 		return n.checkedTypes.Contains(chanType)
 
 	case *ast.Ident:
-		if t, ok := n.typeSpecs[v.Name]; ok {
-			return n.isDangerNilType(t.Type)
+		if t, ok := typeSpecs[v.Name]; ok {
+			return n.isDangerNilType(t.Type, nil)
 		}
 	}
 	return false
