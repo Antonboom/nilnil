@@ -18,19 +18,25 @@ func newDefaultCheckedTypes() checkedTypes {
 
 const separator = ','
 
+type typeName string
+
+func (t typeName) S() string {
+	return string(t)
+}
+
 const (
-	ptrType   = "ptr"
-	funcType  = "func"
-	ifaceType = "iface"
-	mapType   = "map"
-	chanType  = "chan"
+	ptrType   typeName = "ptr"
+	funcType  typeName = "func"
+	ifaceType typeName = "iface"
+	mapType   typeName = "map"
+	chanType  typeName = "chan"
 )
 
-var knownTypes = []string{ptrType, funcType, ifaceType, mapType, chanType}
+var knownTypes = []typeName{ptrType, funcType, ifaceType, mapType, chanType}
 
-type checkedTypes map[string]struct{}
+type checkedTypes map[typeName]struct{}
 
-func (c checkedTypes) Contains(t string) bool {
+func (c checkedTypes) Contains(t typeName) bool {
 	_, ok := c[t]
 	return ok
 }
@@ -38,7 +44,7 @@ func (c checkedTypes) Contains(t string) bool {
 func (c checkedTypes) String() string {
 	result := make([]string, 0, len(c))
 	for t := range c {
-		result = append(result, t)
+		result = append(result, t.S())
 	}
 
 	sort.Strings(result)
@@ -53,9 +59,9 @@ func (c checkedTypes) Set(s string) error {
 
 	c.disableAll()
 	for _, t := range types {
-		switch t {
+		switch tt := typeName(t); tt {
 		case ptrType, funcType, ifaceType, mapType, chanType:
-			c[t] = struct{}{}
+			c[tt] = struct{}{}
 		default:
 			return fmt.Errorf("unknown checked type name %q (see help)", t)
 		}

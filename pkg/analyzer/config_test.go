@@ -18,7 +18,7 @@ func TestCheckedTypes(t *testing.T) {
 	assertStringEqual(t, "chan,iface,ptr", c.String())
 
 	for _, tt := range knownTypes {
-		err := c.Set(tt)
+		err := c.Set(tt.S())
 		assertNoError(t, err)
 
 		for _, tt2 := range knownTypes {
@@ -29,7 +29,7 @@ func TestCheckedTypes(t *testing.T) {
 			}
 		}
 
-		assertStringEqual(t, tt, c.String())
+		assertStringEqual(t, tt.S(), c.String())
 	}
 }
 
