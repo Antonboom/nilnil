@@ -226,8 +226,8 @@ func (r *RateLimiter) Allow() bool {
 - Linter only checks funcs with two return arguments, the last of which has `error` type.
 - Next types are checked:
   * pointers, functions & interfaces (`panic: invalid memory address or nil pointer dereference`);
-  * map (`panic: assignment to entry in nil map`);
-  * chan (`fatal error: all goroutines are asleep - deadlock!`)
+  * maps (`panic: assignment to entry in nil map`);
+  * channels (`fatal error: all goroutines are asleep - deadlock!`)
 - `uinptr` & `unsafe.Pointer` are not checked as a special case.
 - Supported only explicit `return nil, nil`.
 - Types from external packages are not supported.
