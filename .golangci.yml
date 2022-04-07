@@ -6,7 +6,10 @@ issues:
 
 linters-settings:
   gci:
-    local-prefixes: github.com/Antonboom/nilnil
+    sections:
+      - standard
+      - default
+      - prefix(github.com/Antonboom/nilnil)
 
 linters:
   disable-all: true

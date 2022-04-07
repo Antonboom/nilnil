@@ -27,7 +27,7 @@ tasks:
     cmds:
       - echo "Fmt..."
       - gofumpt -w .
-      - gci -local github.com/Antonboom/nilnil -w . > /dev/null
+      - gci write -s Std -s Def -s "Prefix(github.com/Antonboom/nilnil)" . 2> /dev/null
 
   lint:
     cmds:
