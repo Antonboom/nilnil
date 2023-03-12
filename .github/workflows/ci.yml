@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: rlespinasse/github-slug-action@v4
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: ^1.20
       - run: cd /tmp && go install github.com/Antonboom/nilnil@${{ env.GITHUB_REF_NAME }} && nilnil -h
@@ -19,18 +19,18 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: golangci/golangci-lint-action@v2
+      - uses: actions/checkout@v3
+      - uses: golangci/golangci-lint-action@v3
         with:
           version: latest
 
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: ^1.20
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: go test -coverprofile=coverage.out ./...
       - uses: shogo82148/actions-goveralls@v1
         with:
