@@ -124,6 +124,11 @@ func (n *nilNil) isDangerNilType(t ast.Expr, typeSpecs typeSpecByName) bool {
 		return n.checkedTypes.Contains(chanType)
 
 	case *ast.Ident:
+		// Support for any.
+		if n.checkedTypes.Contains(ifaceType) && v.Obj == nil {
+			return true
+		}
+
 		if t, ok := typeSpecs[v.Name]; ok {
 			return n.isDangerNilType(t.Type, nil)
 		}
