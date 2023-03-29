@@ -42,11 +42,21 @@ func iface() (interface{}, error) {
 	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
 }
 
+func anyType() (any, error) {
+	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+}
+
 func m1() (map[int]int, error) {
 	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
 }
 
 func m2() (map[int]*User, error) {
+	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+}
+
+type mapAlias = map[int]*User
+
+func m3() (mapAlias, error) {
 	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
 }
 
