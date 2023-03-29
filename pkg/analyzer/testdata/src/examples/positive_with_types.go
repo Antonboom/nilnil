@@ -27,3 +27,9 @@ func funcType() (FuncType, error) {
 func ifaceType() (Checker, error) {
 	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
 }
+
+type checkerAlias = Checker
+
+func ifaceTypeAliased() (checkerAlias, error) {
+	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+}

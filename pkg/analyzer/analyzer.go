@@ -55,7 +55,9 @@ type typeSpecByName map[string]*ast.TypeSpec
 func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 	insp := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
-	typeSpecs := typeSpecByName{}
+	typeSpecs := typeSpecByName{
+		"any": &ast.TypeSpec{Type: new(ast.InterfaceType)},
+	}
 	insp.Preorder(types, func(node ast.Node) {
 		t := node.(*ast.TypeSpec)
 		typeSpecs[t.Name.Name] = t
@@ -125,7 +127,7 @@ func (n *nilNil) isDangerNilType(t ast.Expr, typeSpecs typeSpecByName) bool {
 
 	case *ast.Ident:
 		if t, ok := typeSpecs[v.Name]; ok {
-			return n.isDangerNilType(t.Type, nil)
+			return n.isDangerNilType(t.Type, typeSpecs)
 		}
 	}
 	return false
