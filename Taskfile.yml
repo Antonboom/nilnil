@@ -15,8 +15,8 @@ tasks:
 
   tools:install:
     - echo "Install local tools..."
-    - (which gci > /dev/null) || GO111MODULE=off go install github.com/daixiang0/gci@latest
-    - (which gofumpt > /dev/null) || GO111MODULE=off go install mvdan.cc/gofumpt@latest
+    - (which gci > /dev/null) || go install github.com/daixiang0/gci@latest
+    - (which gofumpt > /dev/null) || go install mvdan.cc/gofumpt@latest
 
   tidy:
     cmds:
