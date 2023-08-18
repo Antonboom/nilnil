@@ -1,6 +1,6 @@
 module github.com/Antonboom/nilnil
 
-go 1.21
+go 1.20
 
 require golang.org/x/tools v0.12.0
 
