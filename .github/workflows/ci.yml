@@ -3,38 +3,55 @@ name: CI
 on:
   push:
     branches: [ master ]
+    tags: [ v* ]
   pull_request:
     branches: [ master ]
 
+env:
+  GO_VERSION: ^1.20
+  GOLANGCI_LINT_VERSION: v1.56.2
+
+permissions:
+  contents: read
+
 jobs:
   go_install:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     runs-on: ubuntu-latest
     steps:
-      - uses: rlespinasse/github-slug-action@v4
-      - uses: actions/setup-go@v4
+      - uses: rlespinasse/github-slug-action@v4.4.1
+      - uses: actions/setup-go@v5
         with:
-          go-version: ^1.21
-      - run: cd /tmp && go install github.com/Antonboom/nilnil@${{ env.GITHUB_REF_NAME }} && nilnil -h
+          go-version: ${{ env.GO_VERSION }}
+      - run: cd /tmp && go install github.com/Antonboom/nilnil@${{ env.version }} && nilnil -h
+        env:
+          version: ${{ env.GITHUB_EVENT_PULL_REQUEST_HEAD_SHA || env.GITHUB_REF_SLUG }}
 
   lint:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
-      - uses: actions/checkout@v3
+          go-version: ${{ env.GO_VERSION }}
+      - uses: actions/checkout@v4
       - uses: golangci/golangci-lint-action@v3
         with:
-          version: v1.54.0
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
           args: --timeout=5m
 
-  tests:
+  test:
+    permissions:
+      checks: write  # for shogo82148/actions-goveralls to create a new check based on the results
+      contents: read  # for actions/checkout to fetch code
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: ^1.21
-      - uses: actions/checkout@v3
+          go-version: ${{ env.GO_VERSION }}
+      - uses: actions/checkout@v4
       - run: go test -coverprofile=coverage.out ./...
       - uses: shogo82148/actions-goveralls@v1
         with:
