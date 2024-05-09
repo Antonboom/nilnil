@@ -11,6 +11,7 @@ import (
 func TestNilNil(t *testing.T) {
 	pkgs := []string{
 		"examples",
+		"strange",
 	}
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
 }

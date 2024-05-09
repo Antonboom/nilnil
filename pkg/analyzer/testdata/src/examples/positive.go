@@ -122,3 +122,12 @@ func deeplyNested() {
 		}
 	}
 }
+
+type MyError interface {
+	error
+	Code() string
+}
+
+func myError() (*User, MyError) {
+	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+}
