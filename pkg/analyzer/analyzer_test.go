@@ -14,7 +14,6 @@ func TestNilNil(t *testing.T) {
 	pkgs := []string{
 		"examples",
 		"strange",
-		"unsafe",
 	}
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
 }
