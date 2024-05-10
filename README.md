@@ -64,8 +64,9 @@ $ nilnil --checked-types ptr,func ./...
 
 ### golangci-lint
 
+https://golangci-lint.run/usage/linters/#nilnil
+
 ```yaml
-# https://golangci-lint.run/usage/linters/#nilnil
 nilnil:
   checked-types:
     - ptr
