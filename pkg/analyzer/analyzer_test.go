@@ -15,3 +15,11 @@ func TestNilNil(t *testing.T) {
 	}
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
 }
+
+func TestNilNil_Unsafe(t *testing.T) {
+	anlzr := analyzer.New()
+	if err := anlzr.Flags.Set("checked-types", "uintptr,unsafeptr"); err != nil {
+		t.Fatal(err)
+	}
+	analysistest.Run(t, analysistest.TestData(), anlzr, "unsafe")
+}

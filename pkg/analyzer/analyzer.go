@@ -2,7 +2,9 @@ package analyzer
 
 import (
 	"go/ast"
+	"go/token"
 	"go/types"
+	"strconv"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
@@ -74,13 +76,32 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 				return false
 			}
 
-			fRes1, fRes2 := ft.Results.List[0], ft.Results.List[1]
-			if !(n.isDangerNilField(pass, fRes1) && n.isErrorField(pass, fRes2)) {
+			fRes1Type := pass.TypesInfo.TypeOf(ft.Results.List[0].Type)
+			if fRes1Type == nil {
 				return false
 			}
 
-			rRes1, rRes2 := v.Results[0], v.Results[1]
-			if isNil(pass, rRes1) && isNil(pass, rRes2) {
+			fRes2Type := pass.TypesInfo.TypeOf(ft.Results.List[1].Type)
+			if fRes2Type == nil {
+				return false
+			}
+
+			ok, zv := n.isDangerNilType(fRes1Type)
+			if !(ok && isErrorType(fRes2Type)) {
+				return false
+			}
+
+			retVal, retErr := v.Results[0], v.Results[1]
+
+			var needWarn bool
+			switch zv {
+			case zeroValueNil:
+				needWarn = isNil(pass, retVal) && isNil(pass, retErr)
+			case zeroValueZero:
+				needWarn = isZero(retVal) && isNil(pass, retErr)
+			}
+
+			if needWarn {
 				pass.Reportf(v.Pos(), reportMsg)
 			}
 		}
@@ -91,41 +112,47 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 	return nil, nil //nolint:nilnil
 }
 
-func (n *nilNil) isDangerNilField(pass *analysis.Pass, f *ast.Field) bool {
-	return n.isDangerNilType(pass.TypesInfo.TypeOf(f.Type))
-}
+type zeroValue int
 
-func (n *nilNil) isDangerNilType(t types.Type) bool {
+const (
+	zeroValueNil = iota + 1
+	zeroValueZero
+)
+
+func (n *nilNil) isDangerNilType(t types.Type) (bool, zeroValue) {
 	switch v := t.(type) {
 	case *types.Pointer:
-		return n.checkedTypes.Contains(ptrType)
+		return n.checkedTypes.Contains(ptrType), zeroValueNil
 
 	case *types.Signature:
-		return n.checkedTypes.Contains(funcType)
+		return n.checkedTypes.Contains(funcType), zeroValueNil
 
 	case *types.Interface:
-		return n.checkedTypes.Contains(ifaceType)
+		return n.checkedTypes.Contains(ifaceType), zeroValueNil
 
 	case *types.Map:
-		return n.checkedTypes.Contains(mapType)
+		return n.checkedTypes.Contains(mapType), zeroValueNil
 
 	case *types.Chan:
-		return n.checkedTypes.Contains(chanType)
+		return n.checkedTypes.Contains(chanType), zeroValueNil
+
+	case *types.Basic:
+		if v.Kind() == types.Uintptr {
+			return n.checkedTypes.Contains(uintptrType), zeroValueZero
+		}
+		if v.Kind() == types.UnsafePointer {
+			return n.checkedTypes.Contains(unsafeptrType), zeroValueNil
+		}
 
 	case *types.Named:
 		return n.isDangerNilType(v.Underlying())
 	}
-	return false
+	return false, 0
 }
 
 var errorIface = types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
 
-func (n *nilNil) isErrorField(pass *analysis.Pass, f *ast.Field) bool {
-	t := pass.TypesInfo.TypeOf(f.Type)
-	if t == nil {
-		return false
-	}
-
+func isErrorType(t types.Type) bool {
 	_, ok := t.Underlying().(*types.Interface)
 	return ok && types.Implements(t, errorIface)
 }
@@ -138,4 +165,20 @@ func isNil(pass *analysis.Pass, e ast.Expr) bool {
 
 	_, ok = pass.TypesInfo.ObjectOf(i).(*types.Nil)
 	return ok
+}
+
+func isZero(e ast.Expr) bool {
+	bl, ok := e.(*ast.BasicLit)
+	if !ok {
+		return false
+	}
+	if bl.Kind != token.INT {
+		return false
+	}
+
+	v, err := strconv.ParseInt(bl.Value, 0, 64)
+	if err != nil {
+		return false
+	}
+	return v == 0
 }

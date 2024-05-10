@@ -47,21 +47,25 @@ if err != nil {
 ### What if I think it's bullshit?
 
 I understand that each case needs to be analyzed separately, 
-but I hope that the linter will make you think again -
-is it necessary to use an ambiguous API or is it better to do it using a sentinel error?
+but I hope that the linter will make you think again –
+is it necessary to use an **ambiguous API** or is it better to do it using a sentinel error?
 <br>
 
 In any case, you can just not enable the linter.
 
 ## Configuration
 
+### CLI
+
 ```shell
-# command line (see help for full list of types)
+# See help for full list of types.
 $ nilnil --checked-types ptr,func ./...
 ```
 
+### golangci-lint
+
 ```yaml
-# https://golangci-lint.run/usage/configuration/
+# https://golangci-lint.run/usage/linters/#nilnil
 nilnil:
   checked-types:
     - ptr
@@ -69,6 +73,8 @@ nilnil:
     - iface
     - map
     - chan
+    - uintptr
+    - unsafeptr
 ```
 
 ## Examples
@@ -219,20 +225,12 @@ func (r *RateLimiter) Allow() bool {
 
 ## Assumptions
 
-<details>
-  <summary>Click to expand</summary>
-
-<br>
-
-- Linter only checks functions with two return arguments, the last of which has `error` type.
+- Linter only checks functions with two return arguments, the last of which implements `error`.
 - Next types are checked:
-  * pointers, functions & interfaces (`panic: invalid memory address or nil pointer dereference`);
+  * pointers (including `uinptr` and `unsafe.Pointer`), functions and interfaces (`panic: invalid memory address or nil pointer dereference`);
   * maps (`panic: assignment to entry in nil map`);
   * channels (`fatal error: all goroutines are asleep - deadlock!`)
-- `uinptr` & `unsafe.Pointer` are not checked as a special case.
-- Supported only explicit `return nil, nil`.
-
-</details>
+- Only explicit `return nil, nil` are supported.
 
 ## Check Go 1.22.2 source code
 
