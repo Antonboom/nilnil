@@ -9,17 +9,22 @@ import (
 )
 
 func TestNilNil(t *testing.T) {
+	t.Parallel()
+
 	pkgs := []string{
 		"examples",
 		"strange",
+		"unsafe",
 	}
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
 }
 
-func TestNilNil_Unsafe(t *testing.T) {
+func TestNilNil_Flags(t *testing.T) {
+	t.Parallel()
+
 	anlzr := analyzer.New()
-	if err := anlzr.Flags.Set("checked-types", "uintptr,unsafeptr"); err != nil {
+	if err := anlzr.Flags.Set("checked-types", "ptr"); err != nil {
 		t.Fatal(err)
 	}
-	analysistest.Run(t, analysistest.TestData(), anlzr, "unsafe")
+	analysistest.Run(t, analysistest.TestData(), anlzr, "pointers-only")
 }

@@ -3,6 +3,7 @@ package examples
 import (
 	"bytes"
 	"io"
+	"unsafe"
 )
 
 // Not checked at all.
@@ -36,6 +37,21 @@ func structPtrTypeValid() (*User, error) {
 		return nil, io.EOF
 	}
 	return new(User), nil
+}
+
+func unsafePtrValid() (unsafe.Pointer, error) {
+	if false {
+		return nil, io.EOF
+	}
+	var i int
+	return unsafe.Pointer(&i), nil
+}
+
+func uintPtrValid() (uintptr, error) {
+	if false {
+		return 0, io.EOF
+	}
+	return 0xc82000c290, nil
 }
 
 func channelTypeValid() (ChannelType, error) {
