@@ -28,7 +28,7 @@ func New() *analysis.Analyzer {
 		Run:      n.run,
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
-	a.Flags.Var(&n.checkedTypes, "checked-types", "coma separated list")
+	a.Flags.Var(&n.checkedTypes, "checked-types", "comma separated list")
 
 	return a
 }
