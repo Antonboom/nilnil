@@ -28,10 +28,19 @@ if user != nil { // Ambiguous!
     // Use user.
 }
 ```
-In the worst case, code like this can lead to **panic**.
+
+At best this leads to comments [like](https://github.com/golang/go/blob/07fc59199b9522bfe0d14f35c4391394efc336c9/src/debug/dwarf/line.go#L142)
+
+```go
+// ...
+// If this compilation unit has no line table, it returns nil, nil.
+func (d *Data) LineReader(cu *Entry) (*LineReader, error) {
+```
+
+which is not a _true_ constraint. And in the worst case such code can lead to **panic**.
 <br>
 
-Rewrite the example for sentinel error:
+Rewrite the example above with sentinel error:
 ```go
 user, err := getUser()
 if errors.Is(err, errUserNotFound) {
@@ -240,7 +249,7 @@ func (r *RateLimiter) Allow() bool {
 
 ```shell
 $ cd $GOROOT/src
-$ nilnil ./...
+$ nilnil ./... 2>&1 | grep -v "_test.go"  
 /usr/local/go/src/internal/bisect/bisect.go:196:3: return both the `nil` error and invalid value: use a sentinel error instead
 /usr/local/go/src/net/fd_unix.go:71:3: return both the `nil` error and invalid value: use a sentinel error instead
 /usr/local/go/src/net/fd_unix.go:79:4: return both the `nil` error and invalid value: use a sentinel error instead
@@ -283,23 +292,6 @@ $ nilnil ./...
 /usr/local/go/src/image/png/reader.go:434:4: return both the `nil` error and invalid value: use a sentinel error instead
 /usr/local/go/src/internal/profile/legacy_profile.go:1089:4: return both the `nil` error and invalid value: use a sentinel error instead
 /usr/local/go/src/net/internal/socktest/switch.go:142:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/handshake_client_test.go:2712:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/handshake_server_test.go:427:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/handshake_server_test.go:1029:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/handshake_server_test.go:1490:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/quic_test.go:390:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/tls_test.go:777:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/tls_test.go:781:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/tls_test.go:785:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/tls_test.go:797:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/fakedb_test.go:1200:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql_test.go:938:2: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql_test.go:942:2: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/encoding/xml/xml_test.go:92:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/main_posix_test.go:48:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/net_test.go:338:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/http/transport_test.go:6234:85: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/internal/socktest/main_test.go:48:61: return both the `nil` error and invalid value: use a sentinel error instead
 ```
 
 </details>
