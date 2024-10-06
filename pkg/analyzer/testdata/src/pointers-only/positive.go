@@ -3,11 +3,11 @@ package examples
 type User struct{}
 
 func primitivePtr() (*int, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func structPtr() (*User, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func uintPtr0o() (uintptr, error) {

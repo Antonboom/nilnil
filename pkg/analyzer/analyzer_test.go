@@ -18,7 +18,7 @@ func TestNilNil(t *testing.T) {
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
 }
 
-func TestNilNil_Flags(t *testing.T) {
+func TestNilNil_Flags_CheckedTypes(t *testing.T) {
 	t.Parallel()
 
 	anlzr := analyzer.New()
@@ -26,4 +26,27 @@ func TestNilNil_Flags(t *testing.T) {
 		t.Fatal(err)
 	}
 	analysistest.Run(t, analysistest.TestData(), anlzr, "pointers-only")
+}
+
+func TestNilNil_Flags_DetectOpposite(t *testing.T) {
+	t.Parallel()
+
+	anlzr := analyzer.New()
+	if err := anlzr.Flags.Set("detect-opposite-too", "true"); err != nil {
+		t.Fatal(err)
+	}
+	analysistest.Run(t, analysistest.TestData(), anlzr, "opposite")
+}
+
+func TestNilNil_Flags_DetectOppositeAndCheckedTypes(t *testing.T) {
+	t.Parallel()
+
+	anlzr := analyzer.New()
+	if err := anlzr.Flags.Set("detect-opposite-too", "true"); err != nil {
+		t.Fatal(err)
+	}
+	if err := anlzr.Flags.Set("checked-types", "chan,map"); err != nil {
+		t.Fatal(err)
+	}
+	analysistest.Run(t, analysistest.TestData(), anlzr, "opposite-chan-map-only")
 }

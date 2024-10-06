@@ -10,7 +10,7 @@ tasks:
       - task: tidy
       - task: fmt
       - task: lint
-      - task: tests
+      - task: test
       - task: install
 
   tools:install:
@@ -34,12 +34,12 @@ tasks:
       - echo "Lint..."
       - golangci-lint run --fix ./...
 
-  tests:
+  test:
     cmds:
       - echo "Tests..."
       - go test ./...
 
-  tests:coverage:
+  test:coverage:
     cmds:
       - echo "Tests with coverage..."
       - go test -coverprofile=coverage.out ./...

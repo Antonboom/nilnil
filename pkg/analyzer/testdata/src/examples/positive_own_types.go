@@ -9,29 +9,29 @@ type (
 )
 
 func structPtrType() (StructPtrType, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func primitivePtrType() (PrimitivePtrType, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func channelType() (ChannelType, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func funcType() (FuncType, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func ifaceType() (Checker, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 type checkerAlias = Checker
 
 func ifaceTypeAliased() (checkerAlias, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 type (
@@ -40,5 +40,5 @@ type (
 )
 
 func ptrIntegerType() (PtrIntegerType, error) {
-	return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
