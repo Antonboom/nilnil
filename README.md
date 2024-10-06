@@ -95,8 +95,8 @@ In any case, you can just not enable the linter.
 
 ```shell
 $ nilnil --checked-types chan,func,iface,map,ptr,uintptr,unsafeptr ./...
-$ nilnil --detect-opposite-too ./...
-$ nilnil --detect-opposite-too --checked-types ptr ./..
+$ nilnil --detect-opposite ./...
+$ nilnil --detect-opposite --checked-types ptr ./..
 ```
 
 ### golangci-lint
@@ -106,9 +106,9 @@ https://golangci-lint.run/usage/linters/#nilnil
 ```yaml
 linters-settings:
   nilnil:
-    # Detect opposite situation (simultaneous return of non-nil error and valid value).
+    # In addition, detect opposite situation (simultaneous return of non-nil error and valid value).
     # Default: false
-    detect-opposite-too: true
+    detect-opposite: true
     # List of return types to check.
     # Default: ["chan", "func", "iface", "map", "ptr", "uintptr", "unsafeptr"]
     checked-types:

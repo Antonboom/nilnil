@@ -30,8 +30,8 @@ func New() *analysis.Analyzer {
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 	a.Flags.Var(&n.checkedTypes, "checked-types", "comma separated list of return types to check")
-	a.Flags.BoolVar(&n.detectOppositeToo, "detect-opposite-too", false,
-		"detect opposite situation (simultaneous return of non-nil error and valid value)")
+	a.Flags.BoolVar(&n.detectOppositeToo, "detect-opposite", false,
+		"in addition, detect opposite situation (simultaneous return of non-nil error and valid value)")
 
 	return a
 }

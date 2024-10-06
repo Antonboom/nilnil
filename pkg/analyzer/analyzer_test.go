@@ -32,7 +32,7 @@ func TestNilNil_Flags_DetectOpposite(t *testing.T) {
 	t.Parallel()
 
 	anlzr := analyzer.New()
-	if err := anlzr.Flags.Set("detect-opposite-too", "true"); err != nil {
+	if err := anlzr.Flags.Set("detect-opposite", "true"); err != nil {
 		t.Fatal(err)
 	}
 	analysistest.Run(t, analysistest.TestData(), anlzr, "opposite")
@@ -42,7 +42,7 @@ func TestNilNil_Flags_DetectOppositeAndCheckedTypes(t *testing.T) {
 	t.Parallel()
 
 	anlzr := analyzer.New()
-	if err := anlzr.Flags.Set("detect-opposite-too", "true"); err != nil {
+	if err := anlzr.Flags.Set("detect-opposite", "true"); err != nil {
 		t.Fatal(err)
 	}
 	if err := anlzr.Flags.Set("checked-types", "chan,map"); err != nil {
