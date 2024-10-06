@@ -53,6 +53,34 @@ if err != nil {
 // Use user.
 ```
 
+### Opposite situation
+
+Sometimes people consider the opposite situation (returning a non-nil error and a valid value at the same time) to be
+an anti-pattern too, since it can lead to hard-to-find bugs.
+
+For example, this **kubernetes** code
+
+```go
+func (fh *fakeHistory) UpdateControllerRevision(revision *apps.ControllerRevision, newRevision int64) (*apps.ControllerRevision, error) {
+    clone := revision.DeepCopy()
+    clone.Revision = newRevision
+    return clone, fh.indexer.Update(clone)
+}
+```
+
+can be rewritten as follows
+
+```go
+func (fh *fakeHistory) UpdateControllerRevision(revision *apps.ControllerRevision, newRevision int64) (*apps.ControllerRevision, error) {
+    clone := revision.DeepCopy()
+    clone.Revision = newRevision
+    if err := fh.indexer.Update(clone); err != nil {
+        return nil, fmt.Errorf("update index: %w", err)
+    }
+    return clone, nil
+}
+```
+
 ### What if I think it's bullshit?
 
 I understand that each case needs to be analyzed separately, 
@@ -67,8 +95,9 @@ In any case, you can just not enable the linter.
 ### CLI
 
 ```shell
-# See help for full list of types.
-$ nilnil --checked-types ptr,func ./...
+$ nilnil --checked-types chan,func,iface,map,ptr,uintptr,unsafeptr ./...
+$ nilnil --detect-opposite ./...
+$ nilnil --detect-opposite --checked-types ptr ./..
 ```
 
 ### golangci-lint
@@ -76,15 +105,21 @@ $ nilnil --checked-types ptr,func ./...
 https://golangci-lint.run/usage/linters/#nilnil
 
 ```yaml
-nilnil:
-  checked-types:
-    - ptr
-    - func
-    - iface
-    - map
-    - chan
-    - uintptr
-    - unsafeptr
+linters-settings:
+  nilnil:
+    # In addition, detect opposite situation (simultaneous return of non-nil error and valid value).
+    # Default: false
+    detect-opposite: true
+    # List of return types to check.
+    # Default: ["chan", "func", "iface", "map", "ptr", "uintptr", "unsafeptr"]
+    checked-types:
+      - chan
+      - func
+      - iface
+      - map
+      - ptr
+      - uintptr
+      - unsafeptr
 ```
 
 ## Examples
@@ -250,48 +285,48 @@ func (r *RateLimiter) Allow() bool {
 ```shell
 $ cd $GOROOT/src
 $ nilnil ./... 2>&1 | grep -v "_test.go"  
-/usr/local/go/src/internal/bisect/bisect.go:196:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/fd_unix.go:71:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/fd_unix.go:79:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/fd_unix.go:156:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/iprawsock_posix.go:36:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/tcpsock_posix.go:38:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/udpsock_posix.go:37:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/unixsock_posix.go:92:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/key_agreement.go:46:2: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/ticket.go:355:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/crypto/tls/ticket.go:359:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/driver/types.go:157:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/driver/types.go:232:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/driver/types.go:263:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/convert.go:548:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:205:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:231:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:257:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:284:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:311:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:337:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:363:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:389:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/database/sql/sql.go:422:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/debug/dwarf/entry.go:884:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/debug/dwarf/line.go:146:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/debug/dwarf/line.go:153:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/debug/dwarf/typeunit.go:138:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/debug/pe/file.go:470:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/http/h2_bundle.go:9530:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/http/transfer.go:765:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/http/transfer.go:775:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/http/transfer.go:798:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/go/build/build.go:1442:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/go/build/build.go:1453:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/go/build/build.go:1457:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/go/build/build.go:1491:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/go/internal/gccgoimporter/ar.go:125:3: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/image/jpeg/reader.go:622:5: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/image/png/reader.go:434:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/internal/profile/legacy_profile.go:1089:4: return both the `nil` error and invalid value: use a sentinel error instead
-/usr/local/go/src/net/internal/socktest/switch.go:142:3: return both the `nil` error and invalid value: use a sentinel error instead
+/usr/local/go/src/internal/bisect/bisect.go:196:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/fd_unix.go:71:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/fd_unix.go:79:4: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/fd_unix.go:156:4: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/iprawsock_posix.go:36:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/tcpsock_posix.go:38:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/udpsock_posix.go:37:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/unixsock_posix.go:92:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/crypto/tls/key_agreement.go:46:2: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/crypto/tls/ticket.go:355:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/crypto/tls/ticket.go:359:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/driver/types.go:157:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/driver/types.go:232:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/driver/types.go:263:4: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/convert.go:548:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:205:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:231:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:257:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:284:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:311:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:337:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:363:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:389:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/database/sql/sql.go:422:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/debug/dwarf/entry.go:884:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/debug/dwarf/line.go:146:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/debug/dwarf/line.go:153:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/debug/dwarf/typeunit.go:138:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/debug/pe/file.go:470:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/http/h2_bundle.go:9530:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/http/transfer.go:765:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/http/transfer.go:775:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/http/transfer.go:798:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/go/build/build.go:1442:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/go/build/build.go:1453:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/go/build/build.go:1457:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/go/build/build.go:1491:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/go/internal/gccgoimporter/ar.go:125:3: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/image/jpeg/reader.go:622:5: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/image/png/reader.go:434:4: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/internal/profile/legacy_profile.go:1089:4: return both a `nil` error and an invalid value: use a sentinel error instead
+/usr/local/go/src/net/internal/socktest/switch.go:142:3: return both a `nil` error and an invalid value: use a sentinel error instead
 ```
 
 </details>

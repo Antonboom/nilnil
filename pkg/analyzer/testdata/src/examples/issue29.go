@@ -7,7 +7,7 @@ type data struct {
 
 func nilnil(a, b int) (*data, error) {
 	if a == 0 && b == 0 {
-		return nil, nil // want "return both the `nil` error and invalid value: use a sentinel error instead"
+		return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 	}
 	return &data{a: a, b: b}, nil
 }
