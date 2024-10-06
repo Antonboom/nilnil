@@ -1,6 +1,9 @@
 package examples
 
-import "io"
+import (
+	"io"
+	"unsafe"
+)
 
 type User struct{}
 
@@ -14,6 +17,10 @@ func structPtr() (*User, error) {
 
 func uintPtr0o() (uintptr, error) {
 	return 0o000, io.EOF
+}
+
+func unsafePtr() (unsafe.Pointer, error) {
+	return nil, nil
 }
 
 func chBi() (chan int, error) {

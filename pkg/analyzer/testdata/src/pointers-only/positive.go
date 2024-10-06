@@ -1,5 +1,7 @@
 package examples
 
+import "unsafe"
+
 type User struct{}
 
 func primitivePtr() (*int, error) {
@@ -10,8 +12,12 @@ func structPtr() (*User, error) {
 	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
+func unsafePtr() (unsafe.Pointer, error) {
+	return nil, nil
+}
+
 func uintPtr0o() (uintptr, error) {
-	return 0o000, nil
+	return 0o000, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
 }
 
 func chBi() (chan int, error) {

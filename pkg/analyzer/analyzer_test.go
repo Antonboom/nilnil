@@ -22,7 +22,7 @@ func TestNilNil_Flags_CheckedTypes(t *testing.T) {
 	t.Parallel()
 
 	anlzr := analyzer.New()
-	if err := anlzr.Flags.Set("checked-types", "ptr"); err != nil {
+	if err := anlzr.Flags.Set("checked-types", "ptr,uintptr"); err != nil {
 		t.Fatal(err)
 	}
 	analysistest.Run(t, analysistest.TestData(), anlzr, "pointers-only")
