@@ -71,3 +71,11 @@ type (
 )
 
 func wrap(err error) error { return err }
+
+func structPtr() (*int, error) {
+	return nil, nil // want "return both a `nil` error and an invalid value: use a sentinel error instead"
+}
+
+func structPtrValid() (*int, error) {
+	return new(int), nil
+}
