@@ -92,7 +92,7 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 			}
 
 			ok, zv := n.isDangerNilType(fRes1Type)
-			if !(ok && isErrorType(fRes2Type)) {
+			if !(ok && implementsError(fRes2Type)) {
 				return false
 			}
 
@@ -157,7 +157,7 @@ func (n *nilNil) isDangerNilType(t types.Type) (bool, zeroValue) {
 
 var errorIface = types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
 
-func isErrorType(t types.Type) bool {
+func implementsError(t types.Type) bool {
 	_, ok := t.Underlying().(*types.Interface)
 	return ok && types.Implements(t, errorIface)
 }
