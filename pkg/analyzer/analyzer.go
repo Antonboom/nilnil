@@ -30,21 +30,21 @@ func New() *analysis.Analyzer {
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
 	}
 	a.Flags.Var(&n.checkedTypes, "checked-types", "comma separated list of return types to check")
-	a.Flags.BoolVar(&n.detectOppositeToo, "detect-opposite", false,
+	a.Flags.BoolVar(&n.detectOpposite, "detect-opposite", false,
 		"in addition, detect opposite situation (simultaneous return of non-nil error and valid value)")
 
 	return a
 }
 
 type nilNil struct {
-	checkedTypes      checkedTypes
-	detectOppositeToo bool
+	checkedTypes   checkedTypes
+	detectOpposite bool
 }
 
 func newNilNil() *nilNil {
 	return &nilNil{
-		checkedTypes:      newDefaultCheckedTypes(),
-		detectOppositeToo: false,
+		checkedTypes:   newDefaultCheckedTypes(),
+		detectOpposite: false,
 	}
 }
 
@@ -104,7 +104,7 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 				return false
 			}
 
-			if n.detectOppositeToo && (((zv == zeroValueNil) && !isNil(pass, retVal) && !isNil(pass, retErr)) ||
+			if n.detectOpposite && (((zv == zeroValueNil) && !isNil(pass, retVal) && !isNil(pass, retErr)) ||
 				((zv == zeroValueZero) && !isZero(retVal) && !isNil(pass, retErr))) {
 				pass.Reportf(v.Pos(), notNilNotNilReportMsg)
 				return false

@@ -59,6 +59,7 @@ Sometimes people consider the opposite situation (returning a non-nil error and 
 an anti-pattern too, since it can lead to hard-to-find bugs.
 
 For example, this **kubernetes** code
+
 ```go
 func (fh *fakeHistory) UpdateControllerRevision(revision *apps.ControllerRevision, newRevision int64) (*apps.ControllerRevision, error) {
     clone := revision.DeepCopy()
