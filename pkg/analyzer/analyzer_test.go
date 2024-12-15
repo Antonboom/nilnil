@@ -1,3 +1,5 @@
+//go:debug gotypesalias=1
+
 package analyzer_test
 
 import (
