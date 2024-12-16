@@ -28,7 +28,7 @@ linters:
     - exhaustive
     - forbidigo
     - gci
-    - gocheckcompilerdirectives
+    # - gocheckcompilerdirectives FIXME: https://github.com/leighmcculloch/gocheckcompilerdirectives/pull/3
     - goconst
     - gocritic
     - gocyclo
