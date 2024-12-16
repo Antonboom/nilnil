@@ -3,6 +3,11 @@ run:
 
 issues:
   max-same-issues: 0
+  exclude-rules:
+    - path: pkg/analyzer/analyzer_test.go
+      text: 'compiler directive unrecognized: //go:debug'
+      linters:
+        - gocheckcompilerdirectives
 
 linters-settings:
   gci:
