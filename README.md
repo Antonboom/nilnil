@@ -270,12 +270,12 @@ func (r *RateLimiter) Allow() bool {
 
 ## Assumptions
 
-- Linter only checks functions with two return arguments, the last of which implements `error`.
+- Linter checks functions with more than two return arguments, the last of which implements `error`.
 - Next types are checked:
   * pointers (including `uinptr` and `unsafe.Pointer`), functions and interfaces (`panic: invalid memory address or nil pointer dereference`);
   * maps (`panic: assignment to entry in nil map`);
   * channels (`fatal error: all goroutines are asleep - deadlock!`)
-- Only explicit `return nil, nil` are supported.
+- Only explicit nils (e.g. `return nil, nil` or `return nil, nil, nil, ..., nil`) are supported.
 
 ## Check Go 1.22.2 source code
 
