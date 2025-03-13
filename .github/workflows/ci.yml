@@ -46,15 +46,20 @@ jobs:
     permissions:
       checks: write  # for shogo82148/actions-goveralls to create a new check based on the results
       contents: read  # for actions/checkout to fetch code
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-arch: [ amd64, 386 ]
+        include:
+          - runs-on: ubuntu-latest
+            go-arch: amd64
+          - runs-on: ubuntu-20.04
+            go-arch: 386
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ env.GO_VERSION }}
+          go-arch: ${{ matrix.go-arch }}
       - run: go test -coverprofile=coverage.out ./...
       - uses: shogo82148/actions-goveralls@v1
         with:
