@@ -26,9 +26,10 @@ linters:
     - errchkjson
     - errname
     - exhaustive
+    - exptostd
     - forbidigo
     - gci
-    # - gocheckcompilerdirectives FIXME: https://github.com/leighmcculloch/gocheckcompilerdirectives/pull/3
+    - gocheckcompilerdirectives
     - goconst
     - gocritic
     - gocyclo
@@ -54,6 +55,7 @@ linters:
     - musttag
     - nakedret
     - nilerr
+    - nilnesserr
     - nestif
     - noctx
     - nolintlint
@@ -65,7 +67,6 @@ linters:
     - staticcheck
     - stylecheck
     - tagliatelle
-    - tenv
     - testableexamples
     - thelper
     - tparallel
@@ -74,5 +75,6 @@ linters:
     - unparam
     - unused
     - usestdlibvars
+    - usetesting
     - wastedassign
     - whitespace
