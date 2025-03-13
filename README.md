@@ -98,6 +98,8 @@ In any case, you can just not enable the linter.
 $ nilnil --checked-types chan,func,iface,map,ptr,uintptr,unsafeptr ./...
 $ nilnil --detect-opposite ./...
 $ nilnil --detect-opposite --checked-types ptr ./..
+$ nilnil --only-two=false ./...
+$ nilnil --detect-opposite --only-two=false --checked-types iface,map ./..
 ```
 
 ### golangci-lint
@@ -270,7 +272,8 @@ func (r *RateLimiter) Allow() bool {
 
 ## Assumptions
 
-- Linter checks functions with more than two return arguments, the last of which implements `error`.
+- Linter only checks functions with two return arguments, the last of which implements `error`. To disable this behavior
+and enable linter for N returned values, use `--only-two=false` flag. 
 - Next types are checked:
   * pointers (including `uinptr` and `unsafe.Pointer`), functions and interfaces (`panic: invalid memory address or nil pointer dereference`);
   * maps (`panic: assignment to entry in nil map`);

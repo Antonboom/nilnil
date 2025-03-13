@@ -15,7 +15,6 @@ func TestNilNil(t *testing.T) {
 
 	pkgs := []string{
 		"examples",
-		"multiple-nils",
 		"strange",
 	}
 	analysistest.Run(t, analysistest.TestData(), analyzer.New(), pkgs...)
@@ -54,10 +53,23 @@ func TestNilNil_Flags_DetectOppositeAndCheckedTypes(t *testing.T) {
 	analysistest.Run(t, analysistest.TestData(), anlzr, "opposite-chan-map-only")
 }
 
-func TestNilNil_Flags_DetectOppositeAndMultipleNils(t *testing.T) {
+func TestNilNil_Flags_MultipleNils(t *testing.T) {
 	t.Parallel()
 
 	anlzr := analyzer.New()
+	if err := anlzr.Flags.Set("only-two", "false"); err != nil {
+		t.Fatal(err)
+	}
+	analysistest.Run(t, analysistest.TestData(), anlzr, "multiple-nils")
+}
+
+func TestNilNil_Flags_MultipleNilsAndDetectOpposite(t *testing.T) {
+	t.Parallel()
+
+	anlzr := analyzer.New()
+	if err := anlzr.Flags.Set("only-two", "false"); err != nil {
+		t.Fatal(err)
+	}
 	if err := anlzr.Flags.Set("detect-opposite", "true"); err != nil {
 		t.Fatal(err)
 	}

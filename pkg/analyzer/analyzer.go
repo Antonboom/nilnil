@@ -31,7 +31,9 @@ func New() *analysis.Analyzer {
 	}
 	a.Flags.Var(&n.checkedTypes, "checked-types", "comma separated list of return types to check")
 	a.Flags.BoolVar(&n.detectOpposite, "detect-opposite", false,
-		"in addition, detect opposite situation (simultaneous return of non-nil error and valid value)")
+		"in addition, to detect opposite situation (simultaneous return of non-nil error and valid value)")
+	a.Flags.BoolVar(&n.onlyTwo, "only-two", true,
+		"to check functions with only two return values")
 
 	return a
 }
@@ -39,12 +41,14 @@ func New() *analysis.Analyzer {
 type nilNil struct {
 	checkedTypes   checkedTypes
 	detectOpposite bool
+	onlyTwo        bool
 }
 
 func newNilNil() *nilNil {
 	return &nilNil{
 		checkedTypes:   newDefaultCheckedTypes(),
 		detectOpposite: false,
+		onlyTwo:        true,
 	}
 }
 
@@ -88,13 +92,18 @@ func (n *nilNil) run(pass *analysis.Pass) (interface{}, error) {
 				return false
 			}
 
-			lastFtRes := ft.Results.List[len(ft.Results.List)-1]
+			lastIdx := len(ft.Results.List) - 1
+			if n.onlyTwo {
+				lastIdx = 1
+			}
+
+			lastFtRes := ft.Results.List[lastIdx]
 			if !implementsError(pass.TypesInfo.TypeOf(lastFtRes.Type)) {
 				return false
 			}
 
-			retErr := v.Results[len(v.Results)-1]
-			for i := range len(v.Results) - 1 {
+			retErr := v.Results[lastIdx]
+			for i := range lastIdx {
 				retVal := v.Results[i]
 
 				zv, ok := n.isDangerNilType(pass.TypesInfo.TypeOf(ft.Results.List[i].Type))

@@ -14,7 +14,9 @@ func withoutError2() (*User, *User)               { return nil, nil }
 func withoutError3() (*User, *User, *User)        { return nil, nil, nil }
 func withoutError4() (*User, *User, *User, *User) { return nil, nil, nil, nil }
 
-func invalidOrder() (error, *User) { return nil, nil }
+func invalidOrder() (error, *User)               { return nil, nil }
+func withError3rd() (*User, bool, error)         { return nil, false, nil }
+func withError4th() (*User, *User, *User, error) { return nil, nil, nil, nil }
 
 func slice() ([]int, error) { return nil, nil }
 
