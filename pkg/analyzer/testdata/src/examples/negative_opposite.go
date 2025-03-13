@@ -35,7 +35,7 @@ func uintPtrOpposite() (uintptr, error) {
 	if false {
 		return 0, io.EOF
 	}
-	return 0xc82000c290, wrap(io.EOF)
+	return 0x1000, wrap(io.EOF)
 }
 
 func channelTypeOpposite() (ChannelType, error) {

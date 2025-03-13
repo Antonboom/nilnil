@@ -51,7 +51,7 @@ func uintPtrValid() (uintptr, error) {
 	if false {
 		return 0, io.EOF
 	}
-	return 0xc82000c290, nil
+	return 0x1000, nil
 }
 
 func channelTypeValid() (ChannelType, error) {
