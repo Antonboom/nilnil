@@ -35,7 +35,7 @@ func uintPtrOpposite() (uintptr, error) {
 	if false {
 		return 0, io.EOF
 	}
-	return 0xc82000c290, wrap(io.EOF) // want "return both a non-nil error and a valid value: use separate returns instead"
+	return 0x1000, wrap(io.EOF) // want "return both a non-nil error and a valid value: use separate returns instead"
 }
 
 func channelTypeOpposite() (ChannelType, error) {
