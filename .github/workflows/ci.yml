@@ -47,9 +47,6 @@ jobs:
       checks: write  # for shogo82148/actions-goveralls to create a new check based on the results
       contents: read  # for actions/checkout to fetch code
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-arch: [ amd64, 386 ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
