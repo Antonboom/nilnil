@@ -81,6 +81,8 @@ func (fh *fakeHistory) UpdateControllerRevision(revision *apps.ControllerRevisio
 }
 ```
 
+Use the `--detect-opposite` flag to cover such cases too.
+
 ### What if I think it's bullshit?
 
 I understand that each case needs to be analyzed separately, 
@@ -98,29 +100,13 @@ In any case, you can just not enable the linter.
 $ nilnil --checked-types chan,func,iface,map,ptr,uintptr,unsafeptr ./...
 $ nilnil --detect-opposite ./...
 $ nilnil --detect-opposite --checked-types ptr ./..
+$ nilnil --only-two=false ./...
+$ nilnil --detect-opposite --only-two=false --checked-types iface,map ./..
 ```
 
 ### golangci-lint
 
 https://golangci-lint.run/usage/linters/#nilnil
-
-```yaml
-linters-settings:
-  nilnil:
-    # In addition, detect opposite situation (simultaneous return of non-nil error and valid value).
-    # Default: false
-    detect-opposite: true
-    # List of return types to check.
-    # Default: ["chan", "func", "iface", "map", "ptr", "uintptr", "unsafeptr"]
-    checked-types:
-      - chan
-      - func
-      - iface
-      - map
-      - ptr
-      - uintptr
-      - unsafeptr
-```
 
 ## Examples
 
@@ -270,12 +256,13 @@ func (r *RateLimiter) Allow() bool {
 
 ## Assumptions
 
-- Linter only checks functions with two return arguments, the last of which implements `error`.
+- Linter only checks functions with two return arguments, the last of which implements `error`. To disable this behavior
+and enable linter for N returned values, use `--only-two=false` flag. 
 - Next types are checked:
   * pointers (including `uinptr` and `unsafe.Pointer`), functions and interfaces (`panic: invalid memory address or nil pointer dereference`);
   * maps (`panic: assignment to entry in nil map`);
   * channels (`fatal error: all goroutines are asleep - deadlock!`)
-- Only explicit `return nil, nil` are supported.
+- Only explicit nils (e.g. `return nil, nil` or `return nil, nil, ..., nil`) are supported.
 
 ## Check Go 1.22.2 source code
 
