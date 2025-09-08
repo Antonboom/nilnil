@@ -128,7 +128,7 @@ func (n *nilNil) run(pass *analysis.Pass) (any, error) {
 		return true
 	})
 
-	return nil, nil //nolint:nilnil
+	return nil, nil //nolint:nilnil // Integration interface of analysis.Analyzer.
 }
 
 type zeroValue int

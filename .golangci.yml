@@ -107,6 +107,11 @@ linters:
       disable:
         - fieldalignment
 
+    nolintlint:
+      require-explanation: true
+      allow-no-explanation: [ lll ]
+      require-specific: true
+
     revive:
       severity: error
       rules:
