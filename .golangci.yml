@@ -1,22 +1,32 @@
+version: "2"
+
 run:
   tests: true
 
 issues:
   max-same-issues: 0
 
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/Antonboom/nilnil)
+formatters:
+  enable:
+    - gci
+    - gofumpt
+
+  settings:
+    gci:
+      sections:
+        - standard # A standard section: captures all standard packages.
+        - default  # Default section: contains all imports that could not be matched to another section type.
+        - prefix(github.com/Antonboom/nilnil)
+
+  exclusions:
+    generated: lax
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - asasalint
-    - bidichk
     - asciicheck
+    - bidichk
     - bodyclose
     - copyloopvar
     - dogsled
@@ -28,49 +38,43 @@ linters:
     - exhaustive
     - exptostd
     - forbidigo
-    - gci
     - gocheckcompilerdirectives
     - goconst
     - gocritic
     - gocyclo
     - godot
     - godox
-    - gofmt
-    - gofumpt
     - goheader
-    - goimports
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - importas
     - ineffassign
-    - nilnil
     - lll
     - makezero
     - mirror
     - misspell
     - musttag
     - nakedret
+    - nestif
     - nilerr
     - nilnesserr
-    - nestif
+    - nilnil
     - noctx
     - nolintlint
+    - perfsprint
     - prealloc
     - predeclared
     - reassign
     - revive
     - sqlclosecheck
     - staticcheck
-    - stylecheck
     - tagliatelle
     - testableexamples
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
     - unused
@@ -78,3 +82,57 @@ linters:
     - usetesting
     - wastedassign
     - whitespace
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+
+  settings:
+    gocritic:
+      enable-all: true
+      disabled-checks:
+        - hugeParam
+        - paramTypeCombine
+        - stringConcatSimplify
+        - unnecessaryBlock
+        - whyNoLint
+        - yodaStyleExpr
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: early-return
+          arguments:
+            - preserveScope
+        - name: empty-block
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: identical-branches
+        - name: if-return
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-return
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: useless-break
+        - name: var-declaration
+        - name: var-naming
