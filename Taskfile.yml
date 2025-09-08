@@ -6,17 +6,10 @@ silent: true
 tasks:
   default:
     cmds:
-      - task: tools:install
       - task: tidy
       - task: fmt
       - task: lint
       - task: test
-      - task: install
-
-  tools:install:
-    - echo "Install local tools..."
-    - (which gci > /dev/null) || go install github.com/daixiang0/gci@latest
-    - (which gofumpt > /dev/null) || go install mvdan.cc/gofumpt@latest
 
   tidy:
     cmds:
@@ -26,8 +19,7 @@ tasks:
   fmt:
     cmds:
       - echo "Fmt..."
-      - gofumpt -w .
-      - gci write -s standard -s default -s "Prefix(github.com/Antonboom/nilnil)" . 2> /dev/null
+      - golangci-lint fmt -v ./...
 
   lint:
     cmds:
