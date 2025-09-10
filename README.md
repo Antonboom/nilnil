@@ -106,7 +106,7 @@ $ nilnil --detect-opposite --only-two=false --checked-types iface,map ./..
 
 ### golangci-lint
 
-https://golangci-lint.run/usage/linters/#nilnil
+https://golangci-lint.run/docs/linters/configuration/#nilnil
 
 ## Examples
 
