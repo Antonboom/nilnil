@@ -2,7 +2,7 @@ module github.com/Antonboom/nilnil
 
 go 1.24.0
 
-toolchain go1.25.0
+toolchain go1.26.0
 
 require golang.org/x/tools v0.42.0
 
